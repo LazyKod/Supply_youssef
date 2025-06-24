@@ -4,7 +4,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import Link from "next/link"
 import { ArrowLeft, Download, Pencil, Printer } from "lucide-react"
 
-export default function CommandeDetailPage({ params }) {
+interface CommandeDetailPageProps {
+  params: {
+    id: string
+  }
+}
+
+export default function CommandeDetailPage({ params }: CommandeDetailPageProps) {
   // Dans un cas réel, vous récupéreriez les données de la commande à partir de l'ID
   const commandeId = params.id
 
