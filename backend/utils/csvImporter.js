@@ -26,6 +26,15 @@ const createDefaultUsers = async () => {
     result.push(user);
   }
   
+  
+  // Créer les utilisateurs un par un pour déclencher le middleware de hashage
+  const result = [];
+  for (const userData of defaultUsers) {
+    const user = new User(userData);
+    await user.save();
+    result.push(user);
+  }
+  
   console.log(`✅ ${result.length} utilisateurs par défaut créés`);
   return result;
 };
@@ -48,6 +57,13 @@ const createDefaultUsers = async () => {
     // Supprimer les anciens utilisateurs
     await User.deleteMany({});
     
+    // Créer les utilisateurs un par un pour déclencher le middleware de hashage
+    const result = [];
+    for (const userData of users) {
+      const user = new User(userData);
+      await user.save();
+      result.push(user);
+    }
     // Créer les utilisateurs un par un pour déclencher le middleware de hashage
     const result = [];
     for (const userData of users) {
