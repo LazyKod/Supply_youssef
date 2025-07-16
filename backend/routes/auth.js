@@ -1,30 +1,31 @@
 @@ .. @@
-     // Récupérer l'utilisateur
-     const user = await User.findOne({ email: email.toLowerCase() });
+ // Hash du mot de passe avant sauvegarde
+ userSchema.pre('save', async function(next) {
+   if (!this.isModified('password')) return next();
+   
+   try {
++    console.log('🔐 Hashage du mot de passe pour:', this.email);
+     const salt = await bcrypt.genSalt(10);
+     this.password = await bcrypt.hash(this.password, salt);
++    console.log('✅ Mot de passe hashé avec succès');
+     next();
+   } catch (error) {
++    console.error('❌ Erreur lors du hashage du mot de passe:', error);
+     next(error);
+   }
+ });
 
-     if (!user) {
-+      console.log('❌ Utilisateur non trouvé:', email);
-       return res.status(401).json({
-         success: false,
-         message: 'Identifiants invalides'
-       });
-     }
-
-+    console.log('👤 Utilisateur trouvé:', user.email);
-+    console.log('🔐 Hash du mot de passe en base:', user.password.substring(0, 20) + '...');
-+    
-     // Vérifier le mot de passe
-     const isValidPassword = await user.comparePassword(password);
-     if (!isValidPassword) {
-+      console.log('❌ Mot de passe invalide pour:', email);
-       return res.status(401).json({
-         success: false,
-         message: 'Identifiants invalides'
-       });
-     }
-
-+    console.log('✅ Connexion réussie pour:', email);
-+    
-     // Mettre à jour la dernière connexion
-     user.derniereConnexion = new Date();
-     await user.save();
+ // Méthode pour comparer les mots de passe
+ userSchema.methods.comparePassword = async function(candidatePassword) {
+-  return bcrypt.compare(candidatePassword, this.password);
++  try {
++    console.log('🔍 Comparaison du mot de passe pour:', this.email);
++    const isMatch = await bcrypt.compare(candidatePassword, this.password);
+    
++    console.log('🔍 Résultat de la comparaison:', isMatch ? '✅ Succès' : '❌ Échec');
++    return isMatch;
++  } catch (error) {
++    console.error('❌ Erreur lors de la comparaison du mot de passe:', error);
++    return false;
++  }
+ };
